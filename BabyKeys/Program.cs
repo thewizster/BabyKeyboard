@@ -20,12 +20,13 @@ namespace BabyKeys
 
             // Get total screen size using the helper
             var (totalWidth, totalHeight, minX, minY) = ScreenHelper.GetTotalScreenSize();
-            nativeWindowSettings.Size = new Vector2i(totalWidth, totalHeight);
+            nativeWindowSettings.ClientSize = new Vector2i(totalWidth, totalHeight);
             nativeWindowSettings.Location = new Vector2i(minX, minY);
 
             using (var game = new BabyGame(gameWindowSettings, nativeWindowSettings))
             {
                 game.WindowBorder = WindowBorder.Hidden; // Hide window borders
+                game.Size = new Vector2i(totalWidth, totalHeight);
                 game.Location = new Vector2i(minX, minY); // Explicitly set the location
                 game.Run();
             }
