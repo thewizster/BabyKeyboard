@@ -10,7 +10,6 @@ namespace BabyGame
     {
         private Texture2D babyShipTexture, sunTexture, starTexture, truckTexture;
         private Vector2 babyShipPosition, sunPosition, starPosition, truckPosition;
-        private float babyShipSpeed = 100f, sunSpeed = 5f, starSpeed, truckSpeed = 30f;
         private GraphicsDeviceManager _graphics;
         (int Width, int Height, int X, int Y) screenSize = ScreenHelper.GetTotalScreenSize();
         private SpriteBatch _spriteBatch;
@@ -24,7 +23,9 @@ namespace BabyGame
 
         private List<(Vector2 Position, float Timer)> starPositions;
         private const float StarLifespan = 4f; // Each star lasts for 5 seconds
-        private const int MaxStars = 10; // Maximum number of stars on screen
+        private const int MaxStars = 15; // Maximum number of stars on screen
+        private float babyShipSpeed = 100f, sunSpeed = 5f, starSpeed, truckSpeed = 30f;
+        private int sunDivider = 3, babyShipDivider = 4;
 
         public BabyGame()
         {
@@ -118,7 +119,7 @@ namespace BabyGame
         private void InitializePositionsAndSpeeds()
         {
             // initialize the baby ship position and speed
-            babyShipPosition = new Vector2((_graphics.PreferredBackBufferWidth / 4),
+            babyShipPosition = new Vector2((_graphics.PreferredBackBufferWidth / babyShipDivider),
                 (_graphics.PreferredBackBufferHeight));
 
             // initialize the truck position and speed
@@ -126,7 +127,7 @@ namespace BabyGame
             _graphics.PreferredBackBufferHeight - 84);
 
             //initialize the sun position and speed
-            sunPosition = new Vector2((_graphics.PreferredBackBufferWidth / 3), _graphics.PreferredBackBufferHeight);
+            sunPosition = new Vector2((_graphics.PreferredBackBufferWidth / sunDivider), _graphics.PreferredBackBufferHeight);
 
             // initialize the star position and speed
             starPositions = new List<(Vector2 Position, float Timer)>();
@@ -178,7 +179,7 @@ namespace BabyGame
             // if the sun goes off the screen, reset it to the bottom of the screen
             if (sunPosition.Y < -100)
             {
-                sunPosition = new Vector2((_graphics.PreferredBackBufferWidth / 2), _graphics.PreferredBackBufferHeight + 100);
+                sunPosition = new Vector2((_graphics.PreferredBackBufferWidth / sunDivider), _graphics.PreferredBackBufferHeight + 100);
             } else
             {
                 sunPosition.Y -= sunSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
