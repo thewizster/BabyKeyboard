@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34408.163
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BabyGame", "BabyGame\BabyGame.csproj", "{EAE41FEE-EB85-48AE-800A-998604FA6158}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EAE41FEE-EB85-48AE-800A-998604FA6158}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAE41FEE-EB85-48AE-800A-998604FA6158}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAE41FEE-EB85-48AE-800A-998604FA6158}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAE41FEE-EB85-48AE-800A-998604FA6158}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {162D7CB1-97BC-418B-B31C-20634BBDA16B}
+	EndGlobalSection
+EndGlobal
