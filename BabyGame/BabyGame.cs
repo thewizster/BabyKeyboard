@@ -111,7 +111,7 @@ namespace BabyGame
 
         private void LoadTextures()
         {
-            ballTexture = Content.Load<Texture2D>("ball_orange");
+            ballTexture = Content.Load<Texture2D>("babyship");
             sunTexture = Content.Load<Texture2D>("sun");
             truckTexture = Content.Load<Texture2D>("truck");
             starTexture = Content.Load<Texture2D>("star");
