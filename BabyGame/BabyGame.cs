@@ -8,10 +8,11 @@ namespace BabyGame
 {
     public class BabyGame : Game
     {
-        private Texture2D ballTexture, sunTexture, starTexture, truckTexture;
-        private Vector2 ballPosition, sunPosition, starPosition, truckPosition;
-        private float ballSpeed, sunSpeed, starSpeed, truckSpeed;
+        private Texture2D babyShipTexture, sunTexture, starTexture, truckTexture;
+        private Vector2 babyShipPosition, sunPosition, starPosition, truckPosition;
+        private float babyShipSpeed = 100f, sunSpeed = 5f, starSpeed, truckSpeed = 30f;
         private GraphicsDeviceManager _graphics;
+        (int Width, int Height, int X, int Y) screenSize = ScreenHelper.GetTotalScreenSize();
         private SpriteBatch _spriteBatch;
         private Color _backgroundColor;
         private float _transitionTime;
@@ -22,14 +23,21 @@ namespace BabyGame
         private Random _random;
 
         private List<(Vector2 Position, float Timer)> starPositions;
-        private const float StarLifespan = 5f; // Each star lasts for 5 seconds
-        private const int MaxStars = 5; // Maximum number of stars on screen
+        private const float StarLifespan = 4f; // Each star lasts for 5 seconds
+        private const int MaxStars = 10; // Maximum number of stars on screen
 
         public BabyGame()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            _graphics.IsFullScreen = false;
+            _graphics.HardwareModeSwitch = true;
+            _graphics.ApplyChanges();
+
+            Window.AllowUserResizing = true;
+
             _backgroundColor = Color.CornflowerBlue;
             _transitionTime = 0f;
             _currentColorIndex = 0;
@@ -39,8 +47,22 @@ namespace BabyGame
 
         protected override void Initialize()
         {
-            InitializePositionsAndSpeeds();
             base.Initialize();
+
+            // Set the preferred back buffer size to the total screen size
+            SetFullScreenSizeAcrossAllMonitors();
+
+            InitializePositionsAndSpeeds();
+        }
+
+        private void SetFullScreenSizeAcrossAllMonitors()
+        {
+            Window.Position = new Point(screenSize.X, screenSize.Y);
+
+            _graphics.PreferredBackBufferWidth = screenSize.Width;
+            _graphics.PreferredBackBufferHeight = screenSize.Height;
+            _graphics.ApplyChanges();
+
         }
 
         protected override void LoadContent()
@@ -51,17 +73,21 @@ namespace BabyGame
 
         protected override void Update(GameTime gameTime)
         {
+            base.Update(gameTime);
+
             _currentKeyState = Keyboard.GetState();
 
+            // if the user presses the escape key & x, exit the game
+            if (_currentKeyState.IsKeyDown(Keys.Escape) && _currentKeyState.IsKeyDown(Keys.X))
+                Exit();
+
             UpdateBackgroundColor(gameTime);
-            UpdateBallPosition(gameTime);
+            UpdateBabyShipPosition(gameTime);
             UpdateTruckPosition(gameTime);
             UpdateSunPosition(gameTime);
             UpdateStarPositions(gameTime);
 
             _previousKeyState = _currentKeyState;
-
-            base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -91,19 +117,16 @@ namespace BabyGame
 
         private void InitializePositionsAndSpeeds()
         {
-            // initialize the ball position and speed
-            ballPosition = new Vector2((_graphics.PreferredBackBufferWidth / 4),
+            // initialize the baby ship position and speed
+            babyShipPosition = new Vector2((_graphics.PreferredBackBufferWidth / 4),
                 (_graphics.PreferredBackBufferHeight));
-            ballSpeed = 100f;
 
             // initialize the truck position and speed
             truckPosition = new Vector2(0,
             _graphics.PreferredBackBufferHeight - 84);
-            truckSpeed = 25f;
 
             //initialize the sun position and speed
-            sunPosition = new Vector2((_graphics.PreferredBackBufferWidth / 2), _graphics.PreferredBackBufferHeight);
-            sunSpeed = 5f;
+            sunPosition = new Vector2((_graphics.PreferredBackBufferWidth / 3), _graphics.PreferredBackBufferHeight);
 
             // initialize the star position and speed
             starPositions = new List<(Vector2 Position, float Timer)>();
@@ -111,7 +134,7 @@ namespace BabyGame
 
         private void LoadTextures()
         {
-            ballTexture = Content.Load<Texture2D>("babyship");
+            babyShipTexture = Content.Load<Texture2D>("babyship");
             sunTexture = Content.Load<Texture2D>("sun");
             truckTexture = Content.Load<Texture2D>("truck");
             starTexture = Content.Load<Texture2D>("star");
@@ -162,44 +185,44 @@ namespace BabyGame
             }
         }
 
-        private void UpdateBallPosition(GameTime gameTime)
+        private void UpdateBabyShipPosition(GameTime gameTime)
         {
             if (_currentKeyState.IsKeyDown(Keys.Up))
             {
-                ballPosition.Y -= ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                babyShipPosition.Y -= babyShipSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
 
             if (_currentKeyState.IsKeyDown(Keys.Down))
             {
-                ballPosition.Y += ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                babyShipPosition.Y += babyShipSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
 
             if (_currentKeyState.IsKeyDown(Keys.Left))
             {
-                ballPosition.X -= ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                babyShipPosition.X -= babyShipSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
 
             if (_currentKeyState.IsKeyDown(Keys.Right))
             {
-                ballPosition.X += ballSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                babyShipPosition.X += babyShipSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
 
-            ClampBallPosition();
+            ClampBabyShipPosition();
         }
 
-        private void ClampBallPosition()
+        private void ClampBabyShipPosition()
         {
-            float halfBallWidth = (ballTexture.Width * 0.5f) / 2;
-            float halfBallHeight = (ballTexture.Height * 0.5f) / 2;
+            float halfBabyShipWidth = (babyShipTexture.Width * 0.5f) / 2;
+            float halfBabyShipHeight = (babyShipTexture.Height * 0.5f) / 2;
 
-            ballPosition.X = MathHelper.Clamp(ballPosition.X, halfBallWidth, _graphics.PreferredBackBufferWidth - halfBallWidth);
-            ballPosition.Y = MathHelper.Clamp(ballPosition.Y, halfBallHeight, _graphics.PreferredBackBufferHeight - halfBallHeight);
+            babyShipPosition.X = MathHelper.Clamp(babyShipPosition.X, halfBabyShipWidth, _graphics.PreferredBackBufferWidth - halfBabyShipWidth);
+            babyShipPosition.Y = MathHelper.Clamp(babyShipPosition.Y, halfBabyShipHeight, _graphics.PreferredBackBufferHeight - halfBabyShipHeight);
         }
 
         private void DrawGameObjects()
         {
             DrawSun();
-            DrawBall();
+            DrawBabyShip();
             DrawTruck();
             DrawStars();
         }
@@ -222,9 +245,9 @@ namespace BabyGame
             }
         }
 
-        private void DrawBall()
+        private void DrawBabyShip()
         {
-            _spriteBatch.Draw(ballTexture, ballPosition, null, Color.White, 0f, new Vector2(ballTexture.Width / 2, ballTexture.Height / 2), new Vector2(0.5f, 0.5f), SpriteEffects.None, 0f);
+            _spriteBatch.Draw(babyShipTexture, babyShipPosition, null, Color.White, 0f, new Vector2(babyShipTexture.Width / 2, babyShipTexture.Height / 2), new Vector2(0.5f, 0.5f), SpriteEffects.None, 0f);
         }
 
         private void DrawTruck()
