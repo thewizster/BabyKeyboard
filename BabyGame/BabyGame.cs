@@ -21,6 +21,10 @@ namespace BabyGame
         private KeyboardState _previousKeyState;
         private Random _random;
 
+        private List<(Vector2 Position, float Timer)> starPositions;
+        private const float StarLifespan = 5f; // Each star lasts for 5 seconds
+        private const int MaxStars = 5; // Maximum number of stars on screen
+
         public BabyGame()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -53,6 +57,7 @@ namespace BabyGame
             UpdateBallPosition(gameTime);
             UpdateTruckPosition(gameTime);
             UpdateSunPosition(gameTime);
+            UpdateStarPositions(gameTime);
 
             _previousKeyState = _currentKeyState;
 
@@ -99,6 +104,9 @@ namespace BabyGame
             //initialize the sun position and speed
             sunPosition = new Vector2((_graphics.PreferredBackBufferWidth / 2), _graphics.PreferredBackBufferHeight);
             sunSpeed = 5f;
+
+            // initialize the star position and speed
+            starPositions = new List<(Vector2 Position, float Timer)>();
         }
 
         private void LoadTextures()
@@ -108,6 +116,7 @@ namespace BabyGame
             truckTexture = Content.Load<Texture2D>("truck");
             starTexture = Content.Load<Texture2D>("star");
         }
+
 
         private void UpdateBackgroundColor(GameTime gameTime)
         {
@@ -192,6 +201,25 @@ namespace BabyGame
             DrawSun();
             DrawBall();
             DrawTruck();
+            DrawStars();
+        }
+
+        private void DrawStars()
+        {
+            foreach (var star in starPositions)
+            {
+                _spriteBatch.Draw(
+                    starTexture,
+                    star.Position,
+                    null,
+                    Color.White,
+                    0f,
+                    new Vector2(starTexture.Width / 2, starTexture.Height / 2),
+                    new Vector2(0.25f, 0.25f), // Scale down to 1/4 size
+                    SpriteEffects.None,
+                    0f
+                );
+            }
         }
 
         private void DrawBall()
@@ -207,6 +235,45 @@ namespace BabyGame
         private void DrawSun()
         {
             _spriteBatch.Draw(sunTexture, sunPosition, null, Color.White, 0f, new Vector2(sunTexture.Width / 2, sunTexture.Height / 2), Vector2.One, SpriteEffects.None, 0f);
+        }
+
+        private void UpdateStarPositions(GameTime gameTime)
+        {
+            // Update the lifespan timer for each star and remove expired stars
+            for (int i = starPositions.Count - 1; i >= 0; i--)
+            {
+                starPositions[i] = (starPositions[i].Position, starPositions[i].Timer + (float)gameTime.ElapsedGameTime.TotalSeconds);
+
+                if (starPositions[i].Timer >= StarLifespan)
+                {
+                    starPositions.RemoveAt(i);
+                }
+            }
+
+            if (IsStarKeyJustPressed() && starPositions.Count < MaxStars)
+            {
+                SpawnNewStar();
+            }
+        }
+
+        private bool IsStarKeyJustPressed()
+        {
+            Keys[] starKeys = { Keys.S, Keys.T, Keys.A, Keys.R };
+            foreach (var key in _currentKeyState.GetPressedKeys())
+            {
+                if (Array.Exists(starKeys, k => k == key) && !_previousKeyState.IsKeyDown(key))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void SpawnNewStar()
+        {
+            var randomX = _random.Next(0, _graphics.PreferredBackBufferWidth - starTexture.Width);
+            var randomY = _random.Next(0, _graphics.PreferredBackBufferHeight - starTexture.Height);
+            starPositions.Add((new Vector2(randomX, randomY), 0f));
         }
     }
 }
