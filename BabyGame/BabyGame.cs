@@ -10,6 +10,9 @@ namespace BabyGame
     {
         private Texture2D babyShipTexture, sunTexture, starTexture, truckTexture;
         private Vector2 babyShipPosition, sunPosition, starPosition, truckPosition;
+        float bobbleAmplitude = 1f; // Amplitude of the bobble effect
+        float bobbleSpeed = 10f; // Speed of the bobble effect
+        float time = 0f; // Time variable to track the sine wave
         private GraphicsDeviceManager _graphics;
         (int Width, int Height, int X, int Y) screenSize = ScreenHelper.GetTotalScreenSize();
         private SpriteBatch _spriteBatch;
@@ -169,6 +172,12 @@ namespace BabyGame
             }
             else
             {
+                var baseY = _graphics.PreferredBackBufferHeight - 80;
+                // Update the time variable
+                time += (float)gameTime.ElapsedGameTime.TotalSeconds * bobbleSpeed;
+                // Calculate the vertical offset using a sine wave
+                float verticalOffset = (float)Math.Sin(time) * bobbleAmplitude;
+                truckPosition.Y = baseY + verticalOffset; // 100 is the base Y position
                 truckPosition.X += truckSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
         }
