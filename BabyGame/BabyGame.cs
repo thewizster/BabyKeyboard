@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
 
@@ -10,9 +11,14 @@ namespace BabyGame
     {
         private Texture2D babyShipTexture, sunTexture, starTexture, truckTexture;
         private Vector2 babyShipPosition, sunPosition, starPosition, truckPosition;
+        // effect variables for vehicles
         float bobbleAmplitude = 1f; // Amplitude of the bobble effect
         float bobbleSpeed = 10f; // Speed of the bobble effect
+        float rotationAmplitude = 0.015f; // Amplitude of the rotation effect (in radians)
+        float rotationSpeed = 0.5f; // Speed of the rotation effect
+        float rotationAngle = 0f; // Current rotation angle
         float time = 0f; // Time variable to track the sine wave
+
         private GraphicsDeviceManager _graphics;
         (int Width, int Height, int X, int Y) screenSize = ScreenHelper.GetTotalScreenSize();
         private SpriteBatch _spriteBatch;
@@ -29,6 +35,8 @@ namespace BabyGame
         private const int MaxStars = 15; // Maximum number of stars on screen
         private float babyShipSpeed = 100f, sunSpeed = 5f, starSpeed, truckSpeed = 30f;
         private int sunDivider = 3, babyShipDivider = 4;
+        // Audio assets
+        private Song backgroundMusic;
 
         public BabyGame()
         {
@@ -73,6 +81,7 @@ namespace BabyGame
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             LoadTextures();
+            LoadAudioAssets();
         }
 
         protected override void Update(GameTime gameTime)
@@ -117,6 +126,13 @@ namespace BabyGame
                 Color.Lavender,
                 Color.MistyRose
             };
+        }
+
+        private void LoadAudioAssets()
+        {
+            backgroundMusic = Content.Load<Song>("23-Arriva-Caribe_Full_FM2135");
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(backgroundMusic);
         }
 
         private void InitializePositionsAndSpeeds()
@@ -175,8 +191,11 @@ namespace BabyGame
                 var baseY = _graphics.PreferredBackBufferHeight - 80;
                 // Update the time variable
                 time += (float)gameTime.ElapsedGameTime.TotalSeconds * bobbleSpeed;
-                // Calculate the vertical offset using a sine wave
+                // Calculate the vertical offset for bumpy road sim. using a sine wave
                 float verticalOffset = (float)Math.Sin(time) * bobbleAmplitude;
+                // Calculate the rotation angle for bumpy road sim. using a sine wave
+                rotationAngle = (float)Math.Sin(time * rotationSpeed) * rotationAmplitude;
+                // update the truck position and speed
                 truckPosition.Y = baseY + verticalOffset; // 100 is the base Y position
                 truckPosition.X += truckSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
@@ -262,7 +281,7 @@ namespace BabyGame
 
         private void DrawTruck()
         {
-            _spriteBatch.Draw(truckTexture, truckPosition, null, Color.White, 0f, new Vector2(truckTexture.Width / 2, 0), Vector2.One, SpriteEffects.None, 0f);
+            _spriteBatch.Draw(truckTexture, truckPosition, null, Color.White, rotationAngle, new Vector2(truckTexture.Width / 2, 0), Vector2.One, SpriteEffects.None, 0f);
         }
 
         private void DrawSun()

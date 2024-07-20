@@ -13,6 +13,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin 23-Arriva-Caribe_Full_FM2135.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:23-Arriva-Caribe_Full_FM2135.wav
+
 #begin babyship.png
 /importer:TextureImporter
 /processor:TextureProcessor
