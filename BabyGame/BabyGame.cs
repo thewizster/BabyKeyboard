@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
@@ -11,6 +12,7 @@ namespace BabyGame
     {
         private Texture2D babyShipTexture, sunTexture, starTexture, truckTexture;
         private Vector2 babyShipPosition, sunPosition, starPosition, truckPosition;
+        bool isBabyShipMoving = false;
         // effect variables for vehicles
         float bobbleAmplitude = 1f; // Amplitude of the bobble effect
         float bobbleSpeed = 10f; // Speed of the bobble effect
@@ -37,6 +39,10 @@ namespace BabyGame
         private int sunDivider = 3, babyShipDivider = 4;
         // Audio assets
         private Song backgroundMusic;
+        private SoundEffect babyShipSound;
+        private SoundEffectInstance babyShipSoundInstance;
+        private SoundEffect starAppearPopSound;
+        private SoundEffectInstance starAppearPopSoundInstance;
 
         public BabyGame()
         {
@@ -130,9 +136,21 @@ namespace BabyGame
 
         private void LoadAudioAssets()
         {
+            // load the background music
             backgroundMusic = Content.Load<Song>("23-Arriva-Caribe_Full_FM2135");
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(backgroundMusic);
+
+            // load the spacehip sound effect
+            babyShipSound = Content.Load<SoundEffect>("BweepBeepLoop");
+            babyShipSoundInstance = babyShipSound.CreateInstance();
+            babyShipSoundInstance.IsLooped = true;
+            babyShipSoundInstance.Volume = 0.15f;
+
+            // load the star appear sound effect
+            starAppearPopSound = Content.Load<SoundEffect>("BubblePopBloopy");
+            starAppearPopSoundInstance = starAppearPopSound.CreateInstance();
+            starAppearPopSoundInstance.Volume = 0.8f;
         }
 
         private void InitializePositionsAndSpeeds()
@@ -216,24 +234,41 @@ namespace BabyGame
 
         private void UpdateBabyShipPosition(GameTime gameTime)
         {
+            isBabyShipMoving = false;
             if (_currentKeyState.IsKeyDown(Keys.Up))
             {
+                isBabyShipMoving = true;
                 babyShipPosition.Y -= babyShipSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
 
             if (_currentKeyState.IsKeyDown(Keys.Down))
             {
+                isBabyShipMoving = true;
                 babyShipPosition.Y += babyShipSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
 
             if (_currentKeyState.IsKeyDown(Keys.Left))
             {
+                isBabyShipMoving = true;
                 babyShipPosition.X -= babyShipSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
 
             if (_currentKeyState.IsKeyDown(Keys.Right))
             {
+                isBabyShipMoving = true;
                 babyShipPosition.X += babyShipSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            }
+
+            if (isBabyShipMoving)
+            {
+                if (babyShipSoundInstance.State != SoundState.Playing)
+                {
+                    babyShipSoundInstance.Play();
+                }
+            }
+            else
+            {
+                babyShipSoundInstance.Stop();
             }
 
             ClampBabyShipPosition();
@@ -326,6 +361,7 @@ namespace BabyGame
             var randomX = _random.Next(0, _graphics.PreferredBackBufferWidth - starTexture.Width);
             var randomY = _random.Next(0, _graphics.PreferredBackBufferHeight - starTexture.Height);
             starPositions.Add((new Vector2(randomX, randomY), 0f));
+            starAppearPopSoundInstance.Play();
         }
     }
 }
