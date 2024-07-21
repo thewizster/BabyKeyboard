@@ -17,7 +17,7 @@ namespace BabyGame
         float rotationAmplitude = 0.015f; // Amplitude of the rotation effect (in radians)
         float rotationSpeed = 0.5f; // Speed of the rotation effect
         float rotationAngle = 0f; // Current rotation angle
-        float time = 0f; // Time variable to track the sine wave
+        float sineTime = 0f; // Time variable to track the sine wave
 
         private GraphicsDeviceManager _graphics;
         (int Width, int Height, int X, int Y) screenSize = ScreenHelper.GetTotalScreenSize();
@@ -190,11 +190,11 @@ namespace BabyGame
             {
                 var baseY = _graphics.PreferredBackBufferHeight - 80;
                 // Update the time variable
-                time += (float)gameTime.ElapsedGameTime.TotalSeconds * bobbleSpeed;
+                sineTime += (float)gameTime.ElapsedGameTime.TotalSeconds * bobbleSpeed;
                 // Calculate the vertical offset for bumpy road sim. using a sine wave
-                float verticalOffset = (float)Math.Sin(time) * bobbleAmplitude;
+                float verticalOffset = (float)Math.Sin(sineTime) * bobbleAmplitude;
                 // Calculate the rotation angle for bumpy road sim. using a sine wave
-                rotationAngle = (float)Math.Sin(time * rotationSpeed) * rotationAmplitude;
+                rotationAngle = (float)Math.Sin(sineTime * rotationSpeed) * rotationAmplitude;
                 // update the truck position and speed
                 truckPosition.Y = baseY + verticalOffset; // 100 is the base Y position
                 truckPosition.X += truckSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
